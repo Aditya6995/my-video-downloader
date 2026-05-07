@@ -3,39 +3,37 @@ import yt_dlp
 import os
 
 st.set_page_config(page_title="Video Downloader", page_icon="🎥")
-st.title("🎥 Final YouTube Bypass Downloader")
+st.title("🎥 The Final Bypass Downloader")
 
-url = st.text_input("YouTube/Instagram Link Paste Karein:")
+url = st.text_input("YouTube/Instagram Link:")
 
 if st.button("Download"):
     if url:
         try:
-            with st.spinner('YouTube se chori-chupe data nikaal rahe hain...'):
+            with st.spinner('YouTube ke security filter ko tod rahe hain...'):
                 if os.path.exists("video.mp4"): os.remove("video.mp4")
                 
                 ydl_opts = {
-                    'format': 'best',
+                    'format': 'best[ext=mp4]/best', # Sirf MP4 format force karein
                     'cookiefile': 'cookies.txt',
                     'outtmpl': 'video.mp4',
                     'noplaylist': True,
                     'quiet': True,
-                    'no_check_certificate': True,
-                    'add_header': [
-                        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'Accept-Language: en-us,en;q=0.5',
-                        'Sec-Fetch-Mode: navigate',
-                    ],
-                    'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+                    # Sabse important lines block todne ke liye:
+                    'nocheckcertificate': True,
+                    'geo_bypass': True,
+                    'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
+                    'user_agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36'
                 }
                 
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([url])
                 
                 with open("video.mp4", "rb") as file:
-                    st.success("Success! Ab save kar lijiye.")
+                    st.success("Mil gaya! Ab save karein.")
                     st.download_button("Save Video", data=file, file_name="video.mp4", mime="video/mp4")
         except Exception as e:
-            st.error("YouTube ne server block kar diya hai.")
-            st.info("Try this: Ek baar link badal kar kisi doosre video ka link daalein (kabhi-kabhi ek video block hota hai baaki nahi).")
+            st.error("YouTube ne phir se block kiya. Ye cloud server ki problem hai.")
+            st.info("Try this: Ek bar Instagram ya Twitter link check kijiye. Agar wo chal raha hai, toh code sahi hai.")
     else:
-        st.warning("Pehle link toh daalo!")
+        st.warning("Link missing!")
