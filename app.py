@@ -2,45 +2,41 @@ import streamlit as st
 import yt_dlp
 import os
 
-st.set_page_config(page_title="Ultra HQ Downloader", layout="centered")
+st.set_page_config(page_title="Ultra Video Downloader", page_icon="🎥")
 
-st.title("🎥 Pro Video Downloader (1080p/4K)")
-st.write("Best quality download karne ke liye link daalein:")
+st.title("🎥 Pro Video Downloader")
+st.write("Link daalein aur video download karein:")
 
-url = st.text_input("Paste Link Here:")
+url = st.text_input("Paste Link Here:", placeholder="https://www.youtube.com/...")
 
-if st.button("Download High Quality"):
+if st.button("Download Video"):
     if url:
         try:
-            # File save karne ka rasta (Mac par temporarily save hoga)
-            output_path = 'downloads/%(title)s.%(ext)s'
-            
-            # HQ Settings
-            ydl_opts = {
-                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-                'outtmpl': 'downloaded_video.mp4', # Fixed name for easy access
-                'merge_output_format': 'mp4',
-            }
-
-            with st.spinner('Downloading in High Quality (isne thoda time lag sakta hai)...'):
-                # Purani file delete karna agar maujood hai
-                if os.path.exists("downloaded_video.mp4"):
-                    os.remove("downloaded_video.mp4")
+            with st.spinner('Processing...'):
+                # Purani file delete karna
+                if os.path.exists("video.mp4"):
+                    os.remove("video.mp4")
+                
+                # Nayi settings: Sirf 'best' mangna (FFmpeg ki zaroorat nahi)
+                ydl_opts = {
+                    'format': 'best', 
+                    'outtmpl': 'video.mp4',
+                    'noplaylist': True,
+                }
                 
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([url])
                 
-                # File ready hone ke baad download button dikhana
-                with open("downloaded_video.mp4", "rb") as file:
-                    st.success("Download Complete! Niche diye button par click karke save karein.")
-                    btn = st.download_button(
-                        label="Save Video to Mac",
+                # Download button dikhana
+                with open("video.mp4", "rb") as file:
+                    st.success("Taiyar hai!")
+                    st.download_button(
+                        label="Click here to Save Video",
                         data=file,
-                        file_name="high_quality_video.mp4",
+                        file_name="video.mp4",
                         mime="video/mp4"
                     )
-                    
         except Exception as e:
-            st.error(f"Error: {e}. Agar FFmpeg install nahi hai toh HQ kaam nahi karega.")
+            st.error(f"Error: {str(e)}")
     else:
-        st.warning("Link paste kariyé!")
+        st.warning("Pehle link toh daaliye!")
